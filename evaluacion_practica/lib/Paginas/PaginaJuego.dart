@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class PaginaJuego extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class _PaginaJuegoState extends State<PaginaJuego> {
   int currentQuestion = 0;
   List<Map<String, dynamic>> questions = [];
   int? userAnswer;
+  bool _isAnimationComplete = false;
 
   @override
   void initState() {
@@ -30,7 +32,7 @@ class _PaginaJuegoState extends State<PaginaJuego> {
 
       switch (questionType) {
         case 0:
-          questionText = 'How many hundreds are in $number?';
+          questionText = '¿Cuántos cientos hay en $number?';
           return {
             'type': 'specific_number',
             'number': number,
@@ -41,7 +43,7 @@ class _PaginaJuegoState extends State<PaginaJuego> {
             'questionText': questionText,
           };
         case 1:
-          questionText = 'How many tens are in $number?';
+          questionText = '¿Cuántas decenas hay en $number?';
           return {
             'type': 'specific_number',
             'number': number,
@@ -52,7 +54,7 @@ class _PaginaJuegoState extends State<PaginaJuego> {
             'questionText': questionText,
           };
         case 2:
-          questionText = 'How many ones are in $number?';
+          questionText = '¿Cuántas unidades hay en $number?';
           return {
             'type': 'specific_number',
             'number': number,
@@ -92,9 +94,9 @@ class _PaginaJuegoState extends State<PaginaJuego> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Game Over'),
+              title: Text('Juego Terminado'),
               content: Text(
-                'Correct Answers: $correctAnswers\nIncorrect Answers: $incorrectAnswers',
+                'Respuestas Correctas: $correctAnswers\nRespuestas Incorrectas: $incorrectAnswers',
               ),
               actions: [
                 TextButton(
@@ -102,7 +104,7 @@ class _PaginaJuegoState extends State<PaginaJuego> {
                     Navigator.pop(context);
                     Navigator.pop(context);
                   },
-                  child: Text('Go Back'),
+                  child: Text('Regresar'),
                 ),
               ],
             );
@@ -118,9 +120,50 @@ class _PaginaJuegoState extends State<PaginaJuego> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Game'),
+        backgroundColor: Colors.orange,
+        title: Center(
+          child: AnimatedSwitcher(
+            duration: Duration(seconds: 2),
+            child: _isAnimationComplete
+                ? Text(
+              'Juego nivel 1',
+              style: TextStyle(
+                fontSize: 24.0,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              key: ValueKey('Title'),
+            )
+                : AnimatedTextKit(
+              animatedTexts: [
+                FadeAnimatedText(
+                  'Juego nivel 1',
+                  textStyle: TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+              totalRepeatCount: 1,
+              onFinished: () {
+                setState(() {
+                  _isAnimationComplete = true;
+                });
+              },
+              key: ValueKey('AnimatedTitle'),
+            ),
+          ),
+        ),
       ),
-      body: Padding(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.orange[100]!, Colors.orange[300]!],
+          ),
+        ),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -128,78 +171,42 @@ class _PaginaJuegoState extends State<PaginaJuego> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Correct: $correctAnswers',
-                  style: TextStyle(fontSize: 18.0),
+                  'Correctas: $correctAnswers',
+                  style: TextStyle(fontSize: 18.0, color: Colors.black87),
                 ),
                 Text(
-                  'Incorrect: $incorrectAnswers',
-                  style: TextStyle(fontSize: 18.0),
+                  'Incorrectas: $incorrectAnswers',
+                  style: TextStyle(fontSize: 18.0, color: Colors.black87),
                 ),
               ],
             ),
             SizedBox(height: 16.0),
             Text(
-              'Question ${currentQuestion + 1}:',
-              style: TextStyle(fontSize: 24.0),
+              'Pregunta ${currentQuestion + 1}:',
+              style: TextStyle(fontSize: 24.0, color: Colors.black87),
             ),
             SizedBox(height: 16.0),
             Text(
               currentQuestionData['questionText'],
-              style: TextStyle(fontSize: 24.0),
+              style: TextStyle(fontSize: 24.0, color: Colors.black87),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 32.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 50.0,
-                  height: 50.0,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${currentQuestionData['hundreds']}',
-                      style: TextStyle(fontSize: 24.0),
-                    ),
-                  ),
-                ),
+                _buildNumberBox('${currentQuestionData['hundreds']}'),
                 SizedBox(width: 8.0),
-                Container(
-                  width: 50.0,
-                  height: 50.0,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${currentQuestionData['tens']}',
-                      style: TextStyle(fontSize: 24.0),
-                    ),
-                  ),
-                ),
+                _buildNumberBox('${currentQuestionData['tens']}'),
                 SizedBox(width: 8.0),
-                Container(
-                  width: 50.0,
-                  height: 50.0,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${currentQuestionData['ones']}',
-                      style: TextStyle(fontSize: 24.0),
-                    ),
-                  ),
-                ),
+                _buildNumberBox('${currentQuestionData['ones']}'),
               ],
             ),
             SizedBox(height: 32.0),
             if (userAnswer != null)
               Text(
-                'Your answer: $userAnswer\nCorrect answer: ${currentQuestionData['correctAnswer']}',
-                style: TextStyle(fontSize: 18.0),
+                'Tu respuesta: $userAnswer\nRespuesta correcta: ${currentQuestionData['correctAnswer']}',
+                style: TextStyle(fontSize: 18.0, color: Colors.black87),
                 textAlign: TextAlign.center,
               ),
             SizedBox(height: 16.0),
@@ -210,7 +217,7 @@ class _PaginaJuegoState extends State<PaginaJuego> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text('Submit Answer'),
+                        title: Text('Enviar Respuesta'),
                         content: TextField(
                           keyboardType: TextInputType.number,
                           onSubmitted: (value) {
@@ -218,7 +225,7 @@ class _PaginaJuegoState extends State<PaginaJuego> {
                             Navigator.pop(context);
                           },
                           decoration: InputDecoration(
-                            hintText: 'Enter your answer',
+                            hintText: 'Ingresa tu respuesta',
                           ),
                         ),
                       );
@@ -228,16 +235,48 @@ class _PaginaJuegoState extends State<PaginaJuego> {
                   nextQuestion();
                 }
               },
-              child: Text(userAnswer == null ? 'Submit Answer' : 'Next'),
+              child: Text(userAnswer == null ? 'Enviar Respuesta' : 'Siguiente'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.orange[800],
+              ),
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Go Back'),
+              child: Text('Regresar'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 16.0),
+            Expanded(
+              child: Center(
+                child: Image.asset(
+                  'assets/images/animation.gif',
+                  height: 200,
+                ),
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNumberBox(String number) {
+    return Container(
+      width: 50.0,
+      height: 50.0,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black87),
+        color: Colors.white.withOpacity(0.8),
+      ),
+      child: Center(
+        child: Text(
+          number,
+          style: TextStyle(fontSize: 24.0, color: Colors.black87),
         ),
       ),
     );

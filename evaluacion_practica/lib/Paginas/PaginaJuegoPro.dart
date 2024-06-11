@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
 
 class PaginaJuegoPro extends StatefulWidget {
   @override
@@ -30,7 +31,7 @@ class _PaginaJuegoProState extends State<PaginaJuegoPro> {
 
       switch (questionType) {
         case 0:
-          questionText = 'How many hundreds are in $number?';
+          questionText = '¿Cuántos cientos hay en $number?';
           return {
             'type': 'specific_number',
             'number': number,
@@ -41,7 +42,7 @@ class _PaginaJuegoProState extends State<PaginaJuegoPro> {
             'questionText': questionText,
           };
         case 1:
-          questionText = 'How many tens are in $number?';
+          questionText = '¿Cuántas decenas hay en $number?';
           return {
             'type': 'specific_number',
             'number': number,
@@ -52,7 +53,7 @@ class _PaginaJuegoProState extends State<PaginaJuegoPro> {
             'questionText': questionText,
           };
         case 2:
-          questionText = 'How many ones are in $number?';
+          questionText = '¿Cuántas unidades hay en $number?';
           return {
             'type': 'specific_number',
             'number': number,
@@ -93,9 +94,9 @@ class _PaginaJuegoProState extends State<PaginaJuegoPro> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Game Over'),
+              title: Text('Juego Terminado'),
               content: Text(
-                'Correct Answers: $correctAnswers\nIncorrect Answers: $incorrectAnswers',
+                'Respuestas Correctas: $correctAnswers\nRespuestas Incorrectas: $incorrectAnswers',
               ),
               actions: [
                 TextButton(
@@ -103,7 +104,7 @@ class _PaginaJuegoProState extends State<PaginaJuegoPro> {
                     Navigator.pop(context);
                     Navigator.pop(context);
                   },
-                  child: Text('Go Back'),
+                  child: Text('Regresar'),
                 ),
               ],
             );
@@ -119,9 +120,31 @@ class _PaginaJuegoProState extends State<PaginaJuegoPro> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Didactic Game'),
+        backgroundColor: Colors.green,
+        title: Center(
+          child: AnimatedTextKit(
+            animatedTexts: [
+              FadeAnimatedText(
+                'Juego nivel 2',
+                textStyle: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+            isRepeatingAnimation: true,
+          ),
+        ),
       ),
-      body: Padding(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.green[100]!, Colors.green[400]!],
+          ),
+        ),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -129,77 +152,41 @@ class _PaginaJuegoProState extends State<PaginaJuegoPro> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Correct: $correctAnswers',
-                  style: TextStyle(fontSize: 18.0),
+                  'Correctas: $correctAnswers',
+                  style: TextStyle(fontSize: 18.0, color: Colors.black87),
                 ),
                 Text(
-                  'Incorrect: $incorrectAnswers',
-                  style: TextStyle(fontSize: 18.0),
+                  'Incorrectas: $incorrectAnswers',
+                  style: TextStyle(fontSize: 18.0, color: Colors.black87),
                 ),
               ],
             ),
             SizedBox(height: 16.0),
             Text(
-              'Question ${currentQuestion + 1}:',
-              style: TextStyle(fontSize: 24.0),
+              'Pregunta ${currentQuestion + 1}:',
+              style: TextStyle(fontSize: 24.0, color: Colors.black87),
             ),
             SizedBox(height: 16.0),
             Text(
               currentQuestionData['questionText'],
-              style: TextStyle(fontSize: 24.0),
+              style: TextStyle(fontSize: 24.0, color: Colors.black87),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 32.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 50.0,
-                  height: 50.0,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${currentQuestionData['hundreds']}',
-                      style: TextStyle(fontSize: 24.0),
-                    ),
-                  ),
-                ),
+                _buildNumberBox('${currentQuestionData['hundreds']}'),
                 SizedBox(width: 8.0),
-                Container(
-                  width: 50.0,
-                  height: 50.0,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${currentQuestionData['tens']}',
-                      style: TextStyle(fontSize: 24.0),
-                    ),
-                  ),
-                ),
+                _buildNumberBox('${currentQuestionData['tens']}'),
                 SizedBox(width: 8.0),
-                Container(
-                  width: 50.0,
-                  height: 50.0,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${currentQuestionData['ones']}',
-                      style: TextStyle(fontSize: 24.0),
-                    ),
-                  ),
-                ),
+                _buildNumberBox('${currentQuestionData['ones']}'),
               ],
             ),
             SizedBox(height: 32.0),
             Text(
-              'Your answer: ${userAnswer.join()}',
-              style: TextStyle(fontSize: 18.0),
+              'Tu respuesta: ${userAnswer.join()}',
+              style: TextStyle(fontSize: 18.0, color: Colors.black87),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 16.0),
@@ -213,6 +200,9 @@ class _PaginaJuegoProState extends State<PaginaJuegoPro> {
                       userAnswer.add(index);
                     });
                   },
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white, backgroundColor: Colors.green[700],
+                  ),
                   child: Text('$index'),
                 );
               }),
@@ -225,16 +215,48 @@ class _PaginaJuegoProState extends State<PaginaJuegoPro> {
                   nextQuestion();
                 }
               },
-              child: Text('Submit Answer'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.green[800],
+              ),
+              child: Text('Enviar Respuesta'),
             ),
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Go Back'),
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.grey,
+              ),
+              child: Text('Regresar'),
+            ),
+            SizedBox(height: 16.0),
+            Expanded(
+              child: Center(
+                child: Image.asset(
+                  'assets/images/animation2.gif',
+                  height: 200,
+                ),
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNumberBox(String number) {
+    return Container(
+      width: 50.0,
+      height: 50.0,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black87),
+        color: Colors.white.withOpacity(0.8),
+      ),
+      child: Center(
+        child: Text(
+          number,
+          style: TextStyle(fontSize: 24.0, color: Colors.black87),
         ),
       ),
     );
